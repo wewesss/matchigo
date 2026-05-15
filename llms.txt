@@ -1,0 +1,34 @@
+PROJECT: matchigo
+
+TYPE:
+TypeScript pattern matching library (Rust-like, lazy-compiled, type-safe exhaustiveness)
+
+PURPOSE:
+Fast, data-driven and chained pattern matching engine for TypeScript with compile-time exhaustiveness guarantees.
+Designed for both human developers and AI agents with explicit performance-oriented semantics.
+
+CORE CONCEPTS:
+- matcher(): chained API for expressive pattern matching
+- match(): data-driven one-shot matching with caching
+- compile(): precompiled reusable matcher function
+- matchWalk(): cold-path zero-compilation matcher
+- P.*: pattern primitives (guards, refinements, combinators)
+
+SUPPORTED MODES:
+- Chained matching (matcher)
+- Data-driven matching (match / compile)
+- Cold-path direct matching (matchWalk)
+
+PERFORMANCE MODEL:
+- Literal-only patterns compile to O(1) Map dispatch
+- Complex patterns use optimized tree traversal
+- Compilation is cached when possible
+
+FOR AI AGENTS:
+- Prefer compile() or hoisted matcher() when possible
+- Use matchWalk() only when rules are created per call
+- Avoid rebuilding rule arrays inside hot loops
+- Respect exhaustiveness constraints strictly
+
+AI_CONTEXT_PRIORITY:
+AI.md > README.md > source code
