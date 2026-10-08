@@ -24,6 +24,12 @@
   ],
   "license": "MIT",
   "author": "SUP2Ak",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wewesss/matchigo.git"
+  },
+  "homepage": "https://github.com/wewesss/matchigo#readme",
+  "bugs": "https://github.com/wewesss/matchigo/issues",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
