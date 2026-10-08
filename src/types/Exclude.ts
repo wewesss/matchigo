@@ -15,13 +15,20 @@
 // The fold walks a tuple — the expensive part is union→tuple conversion,
 // which is bounded to reasonable sizes (≤ ~12 shared keys) before TS bail-out.
 
-import type { UnionToIntersection, Simplify } from "./Helpers.ts";
+import type { IsUnion, UnionToIntersection, Simplify } from "./Helpers.ts";
 import type { NarrowedBy } from "./Narrow.ts";
 
-export type DeepExclude<T, Pat> = Exclude<
-  DistributeMatchingUnion<T, Pat>,
-  NarrowedBy<DistributeMatchingUnion<T, Pat>, Pat>
->;
+// When the rule removes nothing (always the case on an open object type), hand
+// back T itself: a structurally equal but fresh type defeats tsc's
+// instantiation cache and makes each chained `.with()` ~4x slower to check.
+export type DeepExclude<T, Pat> =
+  DistributeMatchingUnion<T, Pat> extends infer D ?
+    Exclude<D, NarrowedBy<D, Pat>> extends infer R ?
+      [D] extends [R] ?
+        T
+      : R
+    : never
+  : never;
 
 /**
  * Expand T's union so each member has singleton values on the keys Pat cares
@@ -34,10 +41,16 @@ type DistributeMatchingUnion<T, Pat> =
       T extends object ?
         [keyof T & keyof Pat] extends [never] ?
           T
-        : FoldSplit<T, UnionToTuple<keyof T & keyof Pat>>
+        : HasUnionSlot<T, keyof T & keyof Pat> extends true ?
+          FoldSplit<T, UnionToTuple<keyof T & keyof Pat>>
+        : T
       : T
     : T
   : never;
+
+/** True when at least one of T's slots in K holds a union — otherwise splitting is a no-op. */
+type HasUnionSlot<T, K extends keyof T> =
+  true extends (K extends unknown ? IsUnion<T[K]> : never) ? true : false;
 
 /** Sequentially split T by each key in the tuple; each step is a full union expansion. */
 type FoldSplit<T, KeyTuple> =
