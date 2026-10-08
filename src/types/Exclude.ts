@@ -39,8 +39,7 @@ type DistributeMatchingUnion<T, Pat> =
   T extends unknown ?
     Pat extends object ?
       T extends object ?
-        [keyof T & keyof Pat] extends [never] ?
-          T
+        [keyof T & keyof Pat] extends [never] ? T
         : HasUnionSlot<T, keyof T & keyof Pat> extends true ?
           FoldSplit<T, UnionToTuple<keyof T & keyof Pat>>
         : T
